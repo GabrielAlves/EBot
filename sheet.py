@@ -22,7 +22,6 @@ dias = ['domingo',
         'sexta',
         'sabado']
 
-# TODO: será que é melhor tornar essas funções também assíncronas?
 class Sheet():
     def __init__(self):
         google_creds = Credentials.from_service_account_file(GOOGLE_CREDENTIALS_FILE, scopes = scopes)
@@ -30,8 +29,7 @@ class Sheet():
         sh = google_client.open_by_key(SHEET_ID)
         self.sheet = sh.get_worksheet(0)
     
-    # TODO: tornar nome case insensitive
-    # TODO: resolver melhor os casos em que não há nada na célula
+
     def ler_valor(self, nome, dia):
         nome = nome.lower()
         dia = dia.lower()
@@ -69,7 +67,7 @@ class Sheet():
         else:
             return f"Nome {nome} não encontrado!"
 
-    # TODO: usar tabulate para enfeitar mais a tabela
+
     def ler_tabela(self):
         tabela = self.sheet.get_all_values()
         header = tabela[0]
@@ -94,10 +92,8 @@ class Sheet():
         return True
     
     def gerar_placar(self):
-        # tempos = self.sheet.col_values(9)[1:] # Ignora a coluna título
         tabela = self.sheet.get_all_values()
 
-        num_linhas = len(self.sheet.col_values(1))
         header = tabela[0][0], tabela[0][8]
         nomes_e_total = [[linha[0], linha[8]] for linha in tabela[1:]] # Pega as colunas dos nomes e tempo total
         placar = sorted(nomes_e_total, key = lambda x : int(x[1]), reverse = True)
