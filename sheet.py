@@ -22,6 +22,7 @@ dias = ['domingo',
         'sexta',
         'sabado']
 
+# TODO: tratar o erro de quando sheet_commands espera dois valores (header e tabela), mas recebe um (string de erro)
 class Sheet():
     def __init__(self):
         google_creds = Credentials.from_service_account_file(GOOGLE_CREDENTIALS_FILE, scopes = scopes)
@@ -49,6 +50,7 @@ class Sheet():
             return f"Nome {nome} não encontrado!"
         
     # TODO: retornar a linha atualizada em vez do valor
+    # TODO: retorno ineficiente (refaz a busca da linha) melhorar
     def escrever_valor(self, nome, dia, valor):
         nome = nome.lower()
         dia = dia.lower()
@@ -62,7 +64,7 @@ class Sheet():
             coluna = converter_dia_em_numero(dia)
             linha = celula.row
             self.sheet.update_cell(linha, coluna, valor)
-            return valor if valor else '0'
+            return self.ler_linha(nome) # ineficiente
 
         else:
             return f"Nome {nome} não encontrado!"
@@ -73,7 +75,7 @@ class Sheet():
         header = tabela[0]
         return header, tabela[1:]
     
-    def preencher_vazios(self, valor_default = 0):
+    def completar_zeros(self, valor_default = 0):
         num_linhas = len(self.sheet.col_values(1))
         intervalo = f'B2:H{num_linhas}'
         valores = self.sheet.get_all_values()[1:] # Ignora a linha com os dias da semana
@@ -82,7 +84,7 @@ class Sheet():
         
         return True
     
-    def limpar_tabela(self, valor_default = 0):
+    def zerar_tabela(self, valor_default = 0):
         num_linhas = len(self.sheet.col_values(1))
         intervalo = f'B2:H{num_linhas}'
         valores = self.sheet.get_all_values()[1:] # Ignora a linha com os dias da semana
@@ -105,3 +107,21 @@ class Sheet():
     
     def retornar_link(self):
         return SHEET_URL
+    
+    def ler_linha(self, nome):
+        nome = nome.lower()
+
+        tabela = self.sheet.get_all_values()
+        header = tabela[0]
+
+        for i in range(1, len(tabela) + 1):
+            if i == 1: continue
+            if tabela[i - 1][0] == nome:
+                break
+
+        if i < len(tabela):
+            print(f"i = {i}. Entrou na tabela")
+            return header, [tabela[i]]
+
+        else:
+            return f"Nome {nome} não encontrado na planilha"
