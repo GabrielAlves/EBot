@@ -1,3 +1,9 @@
+class Utils:
+    def pegar_prefixo(bot, msg):
+        nome_bot = bot.user.name if bot.user else "bot"
+        return nome_bot + " "
+
+
 def get_prefix(bot, msg):
     bot_name = bot.user.name if bot.user else "bot"
     return bot_name + " "

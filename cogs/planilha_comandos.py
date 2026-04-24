@@ -1,15 +1,27 @@
 import discord
 from discord.ext import commands
 from tabulate import tabulate
+import re
 
-class SheetCommands(commands.Cog):
+abreviacoes_dias = {
+    "dom" : "domingo",
+    "seg" : "segunda",
+    "ter" : "terca",
+    "qua" : "quarta",
+    "qui" : "quinta",
+    "sex" : "sexta",
+    "sab" : "sabado"
+}
+
+class PlanilhaComandos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name = "ler", aliases = ["ler_valor"])
     async def ler_valor(self, ctx, nome, dia):
         try:
-            valor = self.bot.sheet.ler_valor(nome, dia)
+            if len(dia) == 3: dia = abreviacoes_dias[dia]
+            valor = self.bot.planilha.ler_valor(nome, dia)
             await ctx.send(valor)
         
         except Exception as e:
@@ -19,7 +31,20 @@ class SheetCommands(commands.Cog):
     @commands.command(name="escrever", aliases=["escrever_valor"])
     async def escrever_valor(self, ctx, nome, dia, valor):
         try:
-            header, tabela = self.bot.sheet.escrever_valor(nome, dia, valor)
+            if len(dia) == 3: dia = abreviacoes_dias[dia]
+            header, tabela = self.bot.planilha.escrever_valor(nome, dia, valor)
+            tabela = self.bot.tabulacao.tabular(tabela, header)
+            await ctx.send(f'```{tabela}```')
+        
+        except Exception as e:
+            print(e)
+            await ctx.send("Erro ao enviar mensagem. tente de novo")
+
+    @commands.command(name="somar", aliases=["somar_valor"])
+    async def somar_valor(self, ctx, nome, dia, valor):
+        try:
+            if len(dia) == 3: dia = abreviacoes_dias[dia]
+            header, tabela = self.bot.planilha.somar_valor(nome, dia, valor)
             tabela = self.bot.tabulacao.tabular(tabela, header)
             await ctx.send(f'```{tabela}```')
         
@@ -30,7 +55,7 @@ class SheetCommands(commands.Cog):
     @commands.command(name="tabela", aliases=["ler_tabela"])
     async def ler_tabela(self, ctx):
         try:
-            header, tabela = self.bot.sheet.ler_tabela()
+            header, tabela = self.bot.planilha.ler_tabela()
             tabela = self.bot.tabulacao.tabular(tabela, header)
             await ctx.send(f'```{tabela}```')
         
@@ -43,7 +68,7 @@ class SheetCommands(commands.Cog):
     async def zerar_tabela(self, ctx, confirmacao = None, valor = 0):
         try:
             if confirmacao == 'confirmar':
-                resultado = self.bot.sheet.zerar_tabela(0)
+                resultado = self.bot.planilha.zerar_tabela(0)
 
                 if resultado:
                     await ctx.send(f'Tabela zerada com sucesso')
@@ -61,7 +86,7 @@ class SheetCommands(commands.Cog):
     @commands.command(name="placar", aliases=["gerar_placar"])
     async def gerar_placar(self, ctx):
         try:
-            header, placar = self.bot.sheet.gerar_placar()
+            header, placar = self.bot.planilha.gerar_placar()
             tabela = self.bot.tabulacao.tabular(placar, header)
             await ctx.send(f'```{tabela}```')
             await ctx.send(f"Obs: se esse for o placar final da semana, não se esqueça de zerar a tabela com o comando '{self.bot.get_command("zerar_tabela")}'.")
@@ -73,7 +98,7 @@ class SheetCommands(commands.Cog):
     @commands.command(name="top", aliases=["farmar_aura"])
     async def farmar_aura(self, ctx):
         try:
-            header, primeiro_lugar = self.bot.sheet.farmar_aura()
+            header, primeiro_lugar = self.bot.planilha.farmar_aura()
             tabela = self.bot.tabulacao.tabular(primeiro_lugar, header, num_colunas = 2)
             await ctx.send(f'```{tabela}```')
 
@@ -84,7 +109,7 @@ class SheetCommands(commands.Cog):
     @commands.command(name="completar", aliases=["completar_vazios"])
     async def completar_zeros(self, ctx):
         try:
-            resultado = self.bot.sheet.completar_zeros(0)
+            resultado = self.bot.planilha.completar_zeros(0)
 
             if resultado:
                 await ctx.send(f'Vazios preenchidos com 0')
@@ -99,7 +124,7 @@ class SheetCommands(commands.Cog):
     @commands.command(name="link", aliases=["retornar_link"])
     async def retornar_link(self, ctx):
         try:
-            link = self.bot.sheet.retornar_link()
+            link = self.bot.planilha.retornar_link()
             await ctx.send(link)
 
         except Exception as e:
@@ -109,9 +134,33 @@ class SheetCommands(commands.Cog):
     @commands.command(name="linha", aliases=["ler_linha"])
     async def ler_linha(self, ctx, nome):
         try:
-            header, linha = self.bot.sheet.ler_linha(nome)
+            header, linha = self.bot.planilha.ler_linha(nome)
             tabela = self.bot.tabulacao.tabular(linha, header)
             await ctx.send(f'```{tabela}```')
+
+        except Exception as e:
+            print(e)
+            await ctx.send("Erro ao enviar mensgem. tente de novo")
+
+    @commands.command(name="em_minutos", aliases=["converter_para_minutos"])
+    async def converter_para_minutos(self, ctx, tempo):
+        try:
+            padrao = r'(\d+)h(\d+)m'
+            match = re.match(padrao, tempo)
+            minutos = int(match.group(1)) * 60 + int(match.group(2))
+            await ctx.send(minutos)
+
+        except Exception as e:
+            print(e)
+            await ctx.send("Erro ao enviar mensgem. tente de novo")
+
+    @commands.command(name="em_horas", aliases=["converter_para_horas"])
+    async def converter_para_horas(self, ctx, tempo):
+        try:
+            tempo = int(tempo)
+            horas = tempo // 60
+            minutos = tempo % 60
+            await ctx.send(f"{horas}h{minutos}m")
 
         except Exception as e:
             print(e)
@@ -121,7 +170,7 @@ class SheetCommands(commands.Cog):
     async def abrir_ajuda(self, ctx):
         embed = discord.Embed(
             title="Comandos do Bot",
-            description=f"Todos os comandos devem ser precedidos por '{self.bot.user.name} '",
+            description=f"Todos os comandos devem ser precedidos por '{self.bot.user.name} '.",
             color=discord.Color.blue()
         )
 
@@ -141,16 +190,29 @@ class SheetCommands(commands.Cog):
                 "ler", "<nome> <dia>",
                 "Lê o valor da célula correspondente a <nome> e <dia>.\n"
                 "<nome> e <dia> são case-insensitive.\n"
-                "<dia> deve ser escrito sem acentos.",
+                "<nome> deve existir na planilha.\n"
+                "Argumentos válidos para <dia> : domingo, segunda, terca, quarta, quinta, sexta, sabado.\n"
+                "Abreviações válidas para <dia> : dom, seg, ter, qua, qui, sex, sab.",
                 "ler ezequiel terca", "📖"
             ),
 
             formatar_cmd(
                 "escrever", "<nome> <dia> <valor>",
                 "Escreve um valor na célula correspondente.\n"
-                "<dia> deve ser escrito sem acentos.\n"
-                "<valor> deve ser um número representando minutos.",
+                "<nome> deve existir na planilha.\n"
+                "<valor> deve ser um número representando minutos."
+                "Argumentos válidos para <dia> : domingo, segunda, terca, quarta, quinta, sexta, sabado.\n"
+                "Abreviações válidas para <dia> : dom, seg, ter, qua, qui, sex, sab.",
                 "escrever fernando sabado 60", "✏️"
+            ),
+
+            formatar_cmd(
+                "somar", "<nome> <dia> <valor>",
+                "Soma <valor> no valor atual presente na célula correspondente.\n"
+                "<nome> deve existir na planilha.\n"
+                "Argumentos válidos para <dia> : domingo, segunda, terca, quarta, quinta, sexta, sabado.\n"
+                "Abreviações válidas para <dia> : dom, seg, ter, qua, qui, sex, sab.",
+                "somar nery segunda 30", "➕"
             ),
 
             formatar_cmd(
@@ -192,6 +254,18 @@ class SheetCommands(commands.Cog):
             ),
 
             formatar_cmd(
+                "em_minutos", "<tempo_horas>",
+                "Converte um tempo em formato de horas para minutos.\n",
+                "em_minutos 2h0m", "🕒➡️⏱️"
+            ),
+
+            formatar_cmd(
+                "em_horas", "<tempo_minutos>",
+                "Converte um tempo em minutos para formato de horas.\n",
+                "em_horas 100", "⏱️➡️🕒"
+            ),
+
+            formatar_cmd(
                 "link", "",
                 "Retorna o link da planilha.",
                 "link", "🔗"
@@ -217,7 +291,7 @@ class SheetCommands(commands.Cog):
     async def abrir_sobre(self, ctx):
         embed = discord.Embed(
             title="Sobre o Bot",
-            description=f"Este bot acessa e altera a planilha presente em {self.bot.sheet.retornar_link()}.\n"
+            description=f"Este bot acessa e altera a planilha presente em {self.bot.planilha.retornar_link()}.\n"
             f"Para ver todos os comandos disponíveis, use o comando '{self.bot.get_command("abrir_ajuda")}'\n",
             color=discord.Color.blue()
         )
@@ -239,4 +313,4 @@ class SheetCommands(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(SheetCommands(bot))
+    await bot.add_cog(PlanilhaComandos(bot))

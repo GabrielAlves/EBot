@@ -10,7 +10,7 @@ GOOGLE_CREDENTIALS_FILE = os.getenv('GOOGLE_CREDENTIALS_FILE')
 SHEET_ID = os.getenv('SHEET_ID')
 SHEET_URL = os.getenv('SHEET_URL')
 
-scopes = [
+escopos = [
     "https://www.googleapis.com/auth/spreadsheets"
 ]
 
@@ -23,12 +23,12 @@ dias = ['domingo',
         'sabado']
 
 # TODO: tratar o erro de quando sheet_commands espera dois valores (header e tabela), mas recebe um (string de erro)
-class Sheet():
+class Planilha():
     def __init__(self):
-        google_creds = Credentials.from_service_account_file(GOOGLE_CREDENTIALS_FILE, scopes = scopes)
-        google_client = gspread.authorize(google_creds)
-        sh = google_client.open_by_key(SHEET_ID)
-        self.sheet = sh.get_worksheet(0)
+        google_credenciais = Credentials.from_service_account_file(GOOGLE_CREDENTIALS_FILE, scopes = escopos)
+        google_cliente = gspread.authorize(google_credenciais)
+        p = google_cliente.open_by_key(SHEET_ID)
+        self.planilha = p.get_worksheet(0)
     
 
     def ler_valor(self, nome, dia):
@@ -38,19 +38,19 @@ class Sheet():
         if dia not in dias:
             return f"O dia {dia} é inválido. Tente um dos dias a seguir: {", ".join(dias)}"
 
-        celula = self.sheet.find(nome)
+        celula = self.planilha.find(nome)
 
         if celula:
             coluna = converter_dia_em_numero(dia)
             linha = celula.row
-            valor = self.sheet.cell(linha, coluna).value
+            valor = self.planilha.cell(linha, coluna).value
             return valor if valor else '0'
 
         else:
             return f"Nome {nome} não encontrado!"
         
-    # TODO: retornar a linha atualizada em vez do valor
     # TODO: retorno ineficiente (refaz a busca da linha) melhorar
+    # TODO: tratar valor (pode ser caractere, pode ser número negativo, pode ser não inteiro)
     def escrever_valor(self, nome, dia, valor):
         nome = nome.lower()
         dia = dia.lower()
@@ -58,12 +58,12 @@ class Sheet():
         if dia not in dias:
             return f"O dia {dia} é inválido. Tente um dos nomes a seguir: {", ".join(dias)}"
 
-        celula = self.sheet.find(nome)
+        celula = self.planilha.find(nome)
 
         if celula:
             coluna = converter_dia_em_numero(dia)
             linha = celula.row
-            self.sheet.update_cell(linha, coluna, valor)
+            self.planilha.update_cell(linha, coluna, valor)
             return self.ler_linha(nome) # ineficiente
 
         else:
@@ -71,30 +71,30 @@ class Sheet():
 
 
     def ler_tabela(self):
-        tabela = self.sheet.get_all_values()
+        tabela = self.planilha.get_all_values()
         header = tabela[0]
         return header, tabela[1:]
     
     def completar_zeros(self, valor_default = 0):
-        num_linhas = len(self.sheet.col_values(1))
+        num_linhas = len(self.planilha.col_values(1))
         intervalo = f'B2:H{num_linhas}'
-        valores = self.sheet.get_all_values()[1:] # Ignora a linha com os dias da semana
+        valores = self.planilha.get_all_values()[1:] # Ignora a linha com os dias da semana
         novos_valores = [[int(v) if v != '' else valor_default for v in linha[1:8]] for linha in valores] # preenche com <valor_default> onde não tiver nada entre as colunas B e H 
-        self.sheet.update(intervalo, novos_valores)
+        self.planilha.update(intervalo, novos_valores)
         
         return True
     
     def zerar_tabela(self, valor_default = 0):
-        num_linhas = len(self.sheet.col_values(1))
+        num_linhas = len(self.planilha.col_values(1))
         intervalo = f'B2:H{num_linhas}'
-        valores = self.sheet.get_all_values()[1:] # Ignora a linha com os dias da semana
+        valores = self.planilha.get_all_values()[1:] # Ignora a linha com os dias da semana
         novos_valores = [[int(valor_default) for v in linha[1:8]] for linha in valores] # preenche com <valor_default> onde não tiver nada entre as colunas B e H 
-        self.sheet.update(intervalo, novos_valores)
+        self.planilha.update(intervalo, novos_valores)
         
         return True
     
     def gerar_placar(self):
-        tabela = self.sheet.get_all_values()
+        tabela = self.planilha.get_all_values()
 
         header = tabela[0][0], tabela[0][8]
         nomes_e_total = [[linha[0], linha[8]] for linha in tabela[1:]] # Pega as colunas dos nomes e tempo total
@@ -111,7 +111,7 @@ class Sheet():
     def ler_linha(self, nome):
         nome = nome.lower()
 
-        tabela = self.sheet.get_all_values()
+        tabela = self.planilha.get_all_values()
         header = tabela[0]
 
         for i in range(1, len(tabela) + 1):
@@ -119,9 +119,54 @@ class Sheet():
             if tabela[i - 1][0] == nome:
                 break
 
-        if i < len(tabela):
-            print(f"i = {i}. Entrou na tabela")
-            return header, [tabela[i]]
+        if i <= len(tabela):
+            return header, [tabela[i - 1]]
 
         else:
             return f"Nome {nome} não encontrado na planilha"
+        
+    # TODO: refatorar
+    def escrever_linha(self, nome, valores = []):
+        if valores or len(valores) > 7:
+            for valor in valores:
+                if type(valor) is not int or valor < 0:
+                    return f"O valor {valor} é inválido."
+                
+            conversor_quantidade_coluna = {
+                        1 : "B",
+                        2 : "C",
+                        3 : "D",
+                        4 : "E",
+                        5 : "F",
+                        6 : "G",
+                        7 : "H"
+            }
+
+            num_coluna = conversor_quantidade_coluna[len(valores)]
+
+            celula = self.planilha.find(nome)
+            intervalo = f'B{celula.row}:H{num_coluna}'
+            celula = self.planilha.update(valores, intervalo)
+            return self.ler_linha(nome)
+            
+        else:
+            return f"Passe uma lista válida"
+        
+    def somar_valor(self, nome, dia, valor):
+        nome = nome.lower()
+        dia = dia.lower()
+
+        if dia not in dias:
+            return f"O dia {dia} é inválido. Tente um dos nomes a seguir: {", ".join(dias)}"
+
+        celula = self.planilha.find(nome)
+
+        if celula:
+            coluna = converter_dia_em_numero(dia)
+            linha = celula.row
+            novo_valor = int(self.planilha.cell(linha, coluna).value) + int(valor)
+            self.planilha.update_cell(linha, coluna, novo_valor)
+            return self.ler_linha(nome) # ineficiente
+
+        else:
+            return f"Nome {nome} não encontrado!"
