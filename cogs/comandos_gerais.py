@@ -51,16 +51,6 @@ class ComandosGerais(commands.Cog):
 
         comandos = [
             formatar_cmd(
-                "ler", "<nome> <dia>",
-                "Lê o valor da célula correspondente a <nome> e <dia>.\n"
-                "<nome> e <dia> são case-insensitive.\n"
-                "<nome> deve existir na planilha.\n"
-                "Argumentos válidos para <dia> : domingo, segunda, terca, quarta, quinta, sexta, sabado.\n"
-                "Abreviações válidas para <dia> : dom, seg, ter, qua, qui, sex, sab.",
-                "ler ezequiel terca", "📖"
-            ),
-
-            formatar_cmd(
                 "escrever", "<nome> <dia> <valor>",
                 "Escreve um valor na célula correspondente.\n"
                 "<nome> deve existir na planilha.\n"
@@ -103,12 +93,6 @@ class ComandosGerais(commands.Cog):
                 "top", "",
                 "Mostra o primeiro lugar do ranking.",
                 "top", "🥇"
-            ),
-
-            formatar_cmd(
-                "completar", "",
-                "Preenche células vazias com 0.",
-                "completar", "🧩"
             ),
 
             formatar_cmd(

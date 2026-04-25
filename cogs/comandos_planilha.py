@@ -1,4 +1,5 @@
 from discord.ext import commands
+from excecoes import *
 
 abreviacoes_dias = {
     "dom" : "domingo",
@@ -13,17 +14,6 @@ abreviacoes_dias = {
 class ComandosPlanilha(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command(name = "ler", aliases = ["ler_valor"])
-    async def ler_valor(self, ctx, nome, dia):
-        try:
-            if len(dia) == 3: dia = abreviacoes_dias[dia]
-            valor = self.bot.planilha.ler_valor(nome, dia)
-            await ctx.send(valor)
-        
-        except Exception as e:
-            print(e)
-            await ctx.send("Erro ao enviar mensagem. tente de novo")
     
     @commands.command(name="escrever", aliases=["escrever_valor"])
     async def escrever_valor(self, ctx, nome, dia, valor):
@@ -33,6 +23,9 @@ class ComandosPlanilha(commands.Cog):
             tabela = self.bot.tabulacao.tabular(tabela, header)
             await ctx.send(f'```{tabela}```')
         
+        except (NomeInvalidoErro, DiaInvalidoErro, ValorInvalidoErro) as e:
+            await ctx.send(e)
+
         except Exception as e:
             print(e)
             await ctx.send("Erro ao enviar mensagem. tente de novo")
@@ -44,6 +37,9 @@ class ComandosPlanilha(commands.Cog):
             header, tabela = self.bot.planilha.somar_valor(nome, dia, valor)
             tabela = self.bot.tabulacao.tabular(tabela, header)
             await ctx.send(f'```{tabela}```')
+
+        except (NomeInvalidoErro, DiaInvalidoErro, ValorInvalidoErro) as e:
+            await ctx.send(e)
         
         except Exception as e:
             print(e)
@@ -103,21 +99,6 @@ class ComandosPlanilha(commands.Cog):
             print(e)
             await ctx.send("Erro ao enviar mensgem. tente de novo")
 
-    @commands.command(name="completar", aliases=["completar_vazios"])
-    async def completar_zeros(self, ctx):
-        try:
-            resultado = self.bot.planilha.completar_zeros(0)
-
-            if resultado:
-                await ctx.send(f'Vazios preenchidos com 0')
-
-            else:
-                await ctx.send(f'Erro ao tenter preencher com 0')
-
-        except Exception as e:
-            print(e)
-            await ctx.send("Erro ao enviar mensagem. tente de novo")
-
     @commands.command(name="link", aliases=["retornar_link"])
     async def retornar_link(self, ctx):
         try:
@@ -134,6 +115,9 @@ class ComandosPlanilha(commands.Cog):
             header, linha = self.bot.planilha.ler_linha(nome)
             tabela = self.bot.tabulacao.tabular(linha, header)
             await ctx.send(f'```{tabela}```')
+
+        except (NomeInvalidoErro) as e:
+            await ctx.send(e)
 
         except Exception as e:
             print(e)

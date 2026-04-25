@@ -1,7 +1,5 @@
 import discord
 from discord.ext import commands
-from utils import get_prefix
-from tabulacao import Tabulacao
 from dotenv import load_dotenv
 import os
 
@@ -17,7 +15,7 @@ class Bot(commands.Bot):
 
         intents = discord.Intents.default()
         intents.message_content = True
-        super().__init__(command_prefix = get_prefix, intents = intents)
+        super().__init__(command_prefix = pegar_prefixo, intents = intents)
 
     async def on_ready(self):
         if not self.bot_ligado:
@@ -32,4 +30,9 @@ class Bot(commands.Bot):
 
 
     async def setup_hook(self):
-        await self.load_extension('cogs.planilha_comandos')
+        await self.load_extension('cogs.comandos_planilha')
+        await self.load_extension('cogs.comandos_gerais')
+
+def pegar_prefixo(bot, msg):
+        nome_bot = bot.user.name if bot.user else "bot"
+        return nome_bot + " "
