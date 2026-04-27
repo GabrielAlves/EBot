@@ -6,30 +6,6 @@ class ComandosGerais(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="em_minutos", aliases=["converter_para_minutos"])
-    async def converter_para_minutos(self, ctx, tempo):
-        try:
-            padrao = r'(\d+)h(\d+)m'
-            match = re.match(padrao, tempo)
-            minutos = int(match.group(1)) * 60 + int(match.group(2))
-            await ctx.send(minutos)
-
-        except Exception as e:
-            print(e)
-            await ctx.send("Erro ao enviar mensgem. tente de novo")
-
-    @commands.command(name="em_horas", aliases=["converter_para_horas"])
-    async def converter_para_horas(self, ctx, tempo):
-        try:
-            tempo = int(tempo)
-            horas = tempo // 60
-            minutos = tempo % 60
-            await ctx.send(f"{horas}h{minutos}m")
-
-        except Exception as e:
-            print(e)
-            await ctx.send("Erro ao enviar mensgem. tente de novo")
-
     @commands.command(name="ajuda", aliases=["abrir_ajuda"])
     async def abrir_ajuda(self, ctx):
         embed = discord.Embed(
@@ -73,20 +49,20 @@ class ComandosGerais(commands.Cog):
                 "tabela", "",
                 "Mostra toda a tabela formatada.\n"
                 "Se a visualização da tabela estiver bagunçada. Tente reduzir o zoom da tela pra ver melhor",
-                "tabela", "📊"
+                "tabela", "📋"
             ),
 
             formatar_cmd(
-                "zerar", "confirmar",
+                "zerar", "",
                 "Zera toda a tabela (define todos os tempos como 0).\n"
-                "Necessário usar 'confirmar' para evitar acidentes.",
-                "zerar confirmar", "⚠️"
+                "Este comando não a zera de fato, mas aponta o usuário para outro comando para que ele não zere a tabela acidentalmente com esse comando.",
+                "zerar", "⚠️"
             ),
 
             formatar_cmd(
                 "placar", "",
                 "Gera o ranking com base no tempo total de estudo.",
-                "placar", "🏆"
+                "placar", "📊"
             ),
 
             formatar_cmd(
@@ -99,18 +75,6 @@ class ComandosGerais(commands.Cog):
                 "linha", "<nome>",
                 "Mostra a linha completa de um usuário.",
                 "linha carlos", "👤"
-            ),
-
-            formatar_cmd(
-                "em_minutos", "<tempo_horas>",
-                "Converte um tempo em formato de horas para minutos.\n",
-                "em_minutos 2h0m", "🕒➡️⏱️"
-            ),
-
-            formatar_cmd(
-                "em_horas", "<tempo_minutos>",
-                "Converte um tempo em minutos para formato de horas.\n",
-                "em_horas 100", "⏱️➡️🕒"
             ),
 
             formatar_cmd(

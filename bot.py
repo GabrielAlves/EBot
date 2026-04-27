@@ -8,9 +8,10 @@ load_dotenv()
 CHANNEL_ID = os.getenv('CHANNEL_ID')
 
 class Bot(commands.Bot):
-    def __init__(self, planilha, tabulacao):
+    def __init__(self, planilha, tabulacao, verificador):
         self.planilha = planilha
         self.tabulacao = tabulacao
+        self.verificador = verificador
         self.bot_ligado = False
 
         intents = discord.Intents.default()
