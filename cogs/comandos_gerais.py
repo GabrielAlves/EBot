@@ -1,10 +1,63 @@
 import discord
 from discord.ext import commands
+from excecoes import *
 import re
 
 class ComandosGerais(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(name="sobre", aliases=["abrir_sobre"])
+    async def abrir_sobre(self, ctx):
+        embed = discord.Embed(
+            title="Sobre o Bot",
+            description=f"Este bot acessa e altera a planilha presente em {self.bot.planilha.retornar_link()}.\n"
+            f"Para ver todos os comandos disponíveis, use o comando '{self.bot.get_command("abrir_ajuda")}'\n",
+            color=discord.Color.blue()
+        )
+
+        embed.add_field(
+            name="Programador",
+            value="Gabriel Alves",
+            inline=False
+        )
+
+        embed.add_field(
+            name="Repositório",
+            value="https://github.com/GabrielAlves/EstudoBot",
+            inline=False
+        )
+
+        await ctx.send(embed=embed)
+
+    @commands.command(name="em_minutos", aliases=["converter_para_minutos"])
+    async def converter_para_minutos(self, ctx, valor):
+        try:
+            padrao = r'(\d+)h(\d+)m'
+            match = re.match(padrao, valor)
+            minutos = int(match.group(1)) * 60 + int(match.group(2))
+            await ctx.send(minutos)
+
+        except Exception as e:
+            print(e)
+            await ctx.send(f"Erro:{e}")
+
+    @commands.command(name="em_horas", aliases=["converter_para_horas"])
+    async def converter_para_horas(self, ctx, valor):
+        self.bot.verificador.verificar_valor(valor)
+        valor = int(valor)
+
+        try:
+            horas = valor // 60
+            minutos = valor % 60
+            await ctx.send(f"{horas}h{minutos}m")
+
+        except ValorInvalidoErro as e:
+            await ctx.send(e)
+
+        except Exception as e:
+            print(e)
+            await ctx.send("Erro ao enviar mensgem. tente de novo")
 
     @commands.command(name="ajuda", aliases=["abrir_ajuda"])
     async def abrir_ajuda(self, ctx):
@@ -78,6 +131,19 @@ class ComandosGerais(commands.Cog):
             ),
 
             formatar_cmd(
+                "em_minutos", "<tempo_horas>",
+                "Converte um tempo em formato de horas para minutos.\n",
+                "em_minutos 2h0m", "🕒➡️⏱️"
+            ),
+
+            formatar_cmd(
+                "em_horas", "<tempo_minutos>",
+                "Converte um tempo em minutos para formato de horas.\n",
+                "em_horas 100", "⏱️➡️🕒"
+            ),
+
+
+            formatar_cmd(
                 "link", "",
                 "Retorna o link da planilha.",
                 "link", "🔗"
@@ -98,30 +164,6 @@ class ComandosGerais(commands.Cog):
             )
 
         await ctx.send(embed=embed)
-
-    @commands.command(name="sobre", aliases=["abrir_sobre"])
-    async def abrir_sobre(self, ctx):
-        embed = discord.Embed(
-            title="Sobre o Bot",
-            description=f"Este bot acessa e altera a planilha presente em {self.bot.planilha.retornar_link()}.\n"
-            f"Para ver todos os comandos disponíveis, use o comando '{self.bot.get_command("abrir_ajuda")}'\n",
-            color=discord.Color.blue()
-        )
-
-        embed.add_field(
-            name="Programador",
-            value="Gabriel Alves",
-            inline=False
-        )
-
-        embed.add_field(
-            name="Repositório",
-            value="https://github.com/GabrielAlves/EstudoBot",
-            inline=False
-        )
-
-        await ctx.send(embed=embed)
-
 
 async def setup(bot):
     await bot.add_cog(ComandosGerais(bot))
