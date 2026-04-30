@@ -67,8 +67,9 @@ class ComandosPlanilha(commands.Cog):
     @commands.command(name="confirmar_zerar", aliases=["zerar_tabela"])
     async def confirmar_zerar(self, ctx):
         try:
-            self.bot.planilha.zerar_tabela()
-            await ctx.send(f'Tabela zerada com sucesso')
+            header, tabela = self.bot.planilha.ler_tabela()
+            tabela = self.bot.tabulacao.tabular(header, tabela)
+            await ctx.send(f'```{tabela}```')
 
         except Exception as e:
             await ctx.send(f"Erro: {e}")
