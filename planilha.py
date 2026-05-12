@@ -2,16 +2,18 @@ import gspread
 from google.oauth2.service_account import Credentials
 import os
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
-GOOGLE_CREDENTIALS_FILE = os.getenv('GOOGLE_CREDENTIALS_FILE')
+GOOGLE_CREDENTIALS_JSON = os.getenv('GOOGLE_CREDENTIALS_JSON')
 SHEET_ID = os.getenv('SHEET_ID')
 SHEET_URL = os.getenv('SHEET_URL')
 
 class Planilha():
     def __init__(self):
-        google_credenciais = Credentials.from_service_account_file(GOOGLE_CREDENTIALS_FILE, scopes = ["https://www.googleapis.com/auth/spreadsheets"])
+        google_info = json.loads(GOOGLE_CREDENTIALS_JSON)
+        google_credenciais = Credentials.from_service_account_info(google_info, scopes = ["https://www.googleapis.com/auth/spreadsheets"])
         google_cliente = gspread.authorize(google_credenciais)
         p = google_cliente.open_by_key(SHEET_ID)
         self.planilha = p.get_worksheet(0)
