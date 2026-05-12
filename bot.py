@@ -23,11 +23,11 @@ class Bot(commands.Bot):
             self.bot_ligado = True
             print(f'{self.user} ligado!')
             canal = await self.fetch_channel(CHANNEL_ID)
-            # await canal.send(f'{self.user} está ligado!\nUse o comando "{self.user.name} ajuda" para ver os comandos disponíveis.')
+            await canal.send(f'{self.user} está ligado!\nUse o comando "{self.user.name} ajuda" para ver os comandos disponíveis.')
 
     async def close(self):
         canal = await self.fetch_channel(CHANNEL_ID)
-        # await canal.send(f'{self.user} foi desligado...')
+        await canal.send(f'{self.user} foi desligado...')
 
 
     async def setup_hook(self):

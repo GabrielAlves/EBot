@@ -59,7 +59,7 @@ class ComandosPlanilha(commands.Cog):
     @commands.command(name="zerar", aliases=["preencher_zeros"])
     async def zerar_tabela(self, ctx):
         try:
-            await ctx.send(f"Tem certeza que deseja zerar a tabela? Digite `{self.bot.user.name} confirmar_zerar` para continuar.")
+            await ctx.send(f"Tem certeza que deseja zerar a tabela? Essa ação não pode ser desfeita. Digite `{self.bot.user.name} confirmar_zerar` para continuar.")
 
         except Exception as e:
             await ctx.send(f"Erro: {e}")
@@ -67,6 +67,7 @@ class ComandosPlanilha(commands.Cog):
     @commands.command(name="confirmar_zerar", aliases=["zerar_tabela"])
     async def confirmar_zerar(self, ctx):
         try:
+            self.bot.planilha.zerar_tabela()
             header, tabela = self.bot.planilha.ler_tabela()
             tabela = self.bot.tabulacao.tabular(header, tabela)
             await ctx.send(f'```{tabela}```')
