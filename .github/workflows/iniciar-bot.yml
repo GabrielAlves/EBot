@@ -1,17 +1,18 @@
-name: Iniciar Render Bot
+name: Start Render
 
 on:
   schedule:
-    - cron: "0 21 * *"
+    - cron: "0 21 * * *"
   workflow_dispatch:
 
 jobs:
-  iniciar-bot:
+  start-bot:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Resumir Render
-      run: | 
-        curl -X POST \ 
-        https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/resume \
-        -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
+      - name: Resume Render
+        run: |
+          curl -X POST \
+            https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/resume \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}"
