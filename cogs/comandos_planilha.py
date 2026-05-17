@@ -81,7 +81,7 @@ class ComandosPlanilha(commands.Cog):
             header, placar = self.bot.planilha.gerar_placar()
             tabela = self.bot.tabulacao.tabular(header, placar)
             await ctx.send(f'```{tabela}```')
-            await ctx.send(f"Obs: se esse for o placar final da semana, não se esqueça de zerar a tabela com o comando '{self.bot.get_command("zerar_tabela")}'.")
+            await ctx.send(f"Se esse for o placar final, zere a tabela com o comando '{self.bot.get_command("zerar_tabela")}'.")
         
         except Exception as e:
             await ctx.send(f"Erro: {e}")

@@ -23,7 +23,7 @@ class Bot(commands.Bot):
             self.bot_ligado = True
             print(f'{self.user} ligado!')
             canal = await self.fetch_channel(CHANNEL_ID)
-            await canal.send(f'{self.user} está ligado!\nUse o comando "{self.user.name} ajuda" para ver os comandos disponíveis.')
+            await canal.send(f'{self.user} está ligado!\nUse o comando "{self.user.name} ajuda" para ver os comandos disponÃ­veis.')
 
     async def close(self):
         canal = await self.fetch_channel(CHANNEL_ID)
@@ -33,6 +33,19 @@ class Bot(commands.Bot):
     async def setup_hook(self):
         await self.load_extension('cogs.comandos_planilha')
         await self.load_extension('cogs.comandos_gerais')
+
+    # Método temporário para usar no endpoint do web_app
+    async def gerar_placar_para_endpoint(self):
+        try:
+            canal = await self.fetch_channel(CHANNEL_ID)
+            header, placar = self.planilha.gerar_placar()
+            tabela = self.tabulacao.tabular(header, placar)
+
+            if canal:
+                await canal.send(f'Enviando placar da semana...\n```{tabela}```')
+        
+        except Exception as e:
+            await canal.send(f"Erro: {e}")
 
 def pegar_prefixo(bot, msg):
         nome_bot = bot.user.name if bot.user else "bot"
