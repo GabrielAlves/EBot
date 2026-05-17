@@ -44,7 +44,7 @@ class Bot(commands.Bot):
             tabela = self.tabulacao.tabular(header, placar)
 
             if canal:
-                await canal.send(f'{lider_grupo.mention}, aqui está o placar da semana...\n\n```{tabela}```')
+                await canal.send(f'{lider_grupo.mention}, aqui está o placar da semana...\n```{tabela}```')
         
         except Exception as e:
             await canal.send(f"Erro: {e}")

@@ -44,16 +44,6 @@ class ComandosPlanilha(commands.Cog):
         
         except Exception as e:
             await ctx.send(f"Erro: {e}")
-    
-    @commands.command(name="tabela", aliases=["ler_tabela"])
-    async def ler_tabela(self, ctx):
-        try:
-            header, tabela = self.bot.planilha.ler_tabela()
-            tabela = self.bot.tabulacao.tabular(header, tabela)
-            await ctx.send(f'```{tabela}```')
-        
-        except Exception as e:
-            await ctx.send(f"Erro: {e}")
 
     
     @commands.command(name="zerar", aliases=["preencher_zeros"])
@@ -83,16 +73,6 @@ class ComandosPlanilha(commands.Cog):
             await ctx.send(f'```{tabela}```')
             await ctx.send(f"Se esse for o placar final, zere a tabela com o comando '{self.bot.get_command("zerar_tabela")}'.")
         
-        except Exception as e:
-            await ctx.send(f"Erro: {e}")
-    
-    @commands.command(name="top", aliases=["farmar_aura"])
-    async def farmar_aura(self, ctx):
-        try:
-            header, primeiro_lugar = self.bot.planilha.farmar_aura()
-            tabela = self.bot.tabulacao.tabular(header, primeiro_lugar, num_colunas = 2)
-            await ctx.send(f'```{tabela}```')
-
         except Exception as e:
             await ctx.send(f"Erro: {e}")
 

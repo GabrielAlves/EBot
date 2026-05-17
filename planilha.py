@@ -21,11 +21,6 @@ class Planilha():
     def escrever_valor(self, linha, coluna, valor):
         self.planilha.update_cell(linha, coluna, valor)
         return self.ler_linha(linha) # ineficiente
-            
-    def ler_tabela(self):
-        tabela = self.planilha.get_all_values()
-        header = tabela[0]
-        return header, tabela[1:]
     
     def zerar_tabela(self):
         num_linhas = len(self.planilha.col_values(1))
@@ -37,14 +32,10 @@ class Planilha():
     def gerar_placar(self):
         tabela = self.planilha.get_all_values()
 
-        header = tabela[0][0], tabela[0][8]
-        nomes_e_total = [[linha[0], linha[8]] for linha in tabela[1:]] # Pega as colunas dos nomes e tempo total
-        placar = sorted(nomes_e_total, key = lambda x : int(x[1]), reverse = True)
+        header = tabela[0]
+        tabela = tabela[1:]
+        placar = sorted(tabela, key = lambda x : int(x[8]), reverse = True)
         return header, placar
-    
-    def farmar_aura(self):
-        header, placar = self.gerar_placar()
-        return header, [placar[0]]
     
     def retornar_link(self):
         return SHEET_URL

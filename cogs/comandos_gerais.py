@@ -99,13 +99,6 @@ class ComandosGerais(commands.Cog):
             ),
 
             formatar_cmd(
-                "tabela", "",
-                "Mostra toda a tabela formatada.\n"
-                "Se a visualização da tabela estiver bagunçada. Tente reduzir o zoom da tela pra ver melhor",
-                "tabela", "📋"
-            ),
-
-            formatar_cmd(
                 "zerar", "",
                 "Zera toda a tabela (define todos os tempos como 0).\n"
                 "Este comando não a zera de fato, mas aponta o usuário para outro comando para que ele não zere a tabela acidentalmente com esse comando.",
@@ -114,14 +107,8 @@ class ComandosGerais(commands.Cog):
 
             formatar_cmd(
                 "placar", "",
-                "Gera o ranking com base no tempo total de estudo.",
+                "Retorna a tabela com as linhas ordenadas com base no tempo total de estudo",
                 "placar", "📊"
-            ),
-
-            formatar_cmd(
-                "top", "",
-                "Mostra o primeiro lugar do ranking.",
-                "top", "🥇"
             ),
 
             formatar_cmd(
