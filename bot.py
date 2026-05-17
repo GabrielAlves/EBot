@@ -6,6 +6,7 @@ import os
 load_dotenv()
 
 CHANNEL_ID = os.getenv('CHANNEL_ID')
+LEADER_ID = os.getenv('LEADER_ID')
 
 class Bot(commands.Bot):
     def __init__(self, planilha, tabulacao, verificador):
@@ -37,12 +38,13 @@ class Bot(commands.Bot):
     # Método temporário para usar no endpoint do web_app
     async def gerar_placar_para_endpoint(self):
         try:
+            lider_grupo = await self.fetch_user(LEADER_ID)
             canal = await self.fetch_channel(CHANNEL_ID)
             header, placar = self.planilha.gerar_placar()
             tabela = self.tabulacao.tabular(header, placar)
 
             if canal:
-                await canal.send(f'Enviando placar da semana...\n```{tabela}```')
+                await canal.send(f'{lider_grupo.mention}, aqui está o placar da semana...\n\n```{tabela}```')
         
         except Exception as e:
             await canal.send(f"Erro: {e}")
