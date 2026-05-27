@@ -58,7 +58,7 @@ class ComandosPlanilha(commands.Cog):
     async def confirmar_zerar(self, ctx):
         try:
             self.bot.planilha.zerar_tabela()
-            header, tabela = self.bot.planilha.ler_tabela()
+            header, tabela = self.bot.planilha.gerar_placar()
             tabela = self.bot.tabulacao.tabular(header, tabela)
             await ctx.send(f'```{tabela}```')
 
@@ -76,14 +76,7 @@ class ComandosPlanilha(commands.Cog):
         except Exception as e:
             await ctx.send(f"Erro: {e}")
 
-    @commands.command(name="link", aliases=["retornar_link"])
-    async def retornar_link(self, ctx):
-        try:
-            link = self.bot.planilha.retornar_link()
-            await ctx.send(link)
-
-        except Exception as e:
-            await ctx.send(f"Erro: {e}")
+    
 
     @commands.command(name="linha", aliases=["ler_linha"])
     async def ler_linha(self, ctx, nome):

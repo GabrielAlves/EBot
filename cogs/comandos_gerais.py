@@ -59,6 +59,15 @@ class ComandosGerais(commands.Cog):
             print(e)
             await ctx.send("Erro ao enviar mensgem. tente de novo")
 
+    @commands.command(name="link", aliases=["retornar_link"])
+    async def retornar_link(self, ctx):
+        try:
+            link = self.bot.planilha.retornar_link()
+            await ctx.send(link)
+
+        except Exception as e:
+            await ctx.send(f"Erro: {e}")
+
     @commands.command(name="ajuda", aliases=["abrir_ajuda"])
     async def abrir_ajuda(self, ctx):
         embed = discord.Embed(
