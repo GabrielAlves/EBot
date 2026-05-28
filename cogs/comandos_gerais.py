@@ -68,6 +68,11 @@ class ComandosGerais(commands.Cog):
         except Exception as e:
             await ctx.send(f"Erro: {e}")
 
+    @commands.Cog.listener() 
+    async def on_command_error(self, ctx, error): 
+        if isinstance(error, commands.CommandNotFound): 
+            await ctx.send( f"Erro: o comando '{ctx.invoked_with}' não existe. Use o comando '{self.bot.user.name} {self.bot.get_command("abrir_ajuda")}' para abrir a lista de comandos." )
+
     @commands.command(name="ajuda", aliases=["abrir_ajuda"])
     async def abrir_ajuda(self, ctx):
         embed = discord.Embed(
@@ -91,7 +96,7 @@ class ComandosGerais(commands.Cog):
             formatar_cmd(
                 "escrever", "<nome> <dia> <valor>",
                 "Escreve um valor na célula correspondente.\n"
-                "<nome> deve existir na planilha.\n"
+                "<nome> deve existir na planilha. Se forem fornecidas apenas as primeiras letras, o bot escolherá o primeiro nome que encontrar com elas\n"
                 "<valor> deve ser um número representando minutos."
                 "Argumentos válidos para <dia> : domingo, segunda, terca, quarta, quinta, sexta, sabado.\n"
                 "Abreviações válidas para <dia> : dom, seg, ter, qua, qui, sex, sab.",

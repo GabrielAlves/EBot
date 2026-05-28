@@ -58,6 +58,7 @@ class Verificador:
 
         for linha in range(2, len(nomes) + 1):
             n = nomes[linha - 1].lower()
+            n = n[:len(nome)]
 
             if nome == n:
                 return linha
