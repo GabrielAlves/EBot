@@ -35,6 +35,10 @@ class Planilha():
         header = tabela[0]
         tabela = tabela[1:]
         placar = sorted(tabela, key = lambda x : int(x[8]), reverse = True)
+
+        for i in range(len(placar)):
+            placar[i][8] = f"{placar[i][8]} ({self.converter_em_horas(placar[i][8])})"
+
         return header, placar
     
     def retornar_link(self):
@@ -51,3 +55,10 @@ class Planilha():
         novo_valor = int(self.planilha.cell(linha, coluna).value) + int(valor)
         self.planilha.update_cell(linha, coluna, novo_valor)
         return self.ler_linha(linha) 
+    
+    @staticmethod
+    def converter_em_horas(tempo_minutos):
+        tempo_minutos = int(tempo_minutos)
+        horas = tempo_minutos // 60
+        minutos = tempo_minutos % 60
+        return f"{horas}h{minutos}m"

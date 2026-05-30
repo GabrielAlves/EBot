@@ -15,6 +15,15 @@ def configurar_rotas(bot):
     @app.route('/')
     def home():
         return 'Bot está ligado!'
+    
+    @app.route('/enviar_msg_ligamento')
+    def enviar_msg_ligamento():
+        asyncio.run_coroutine_threadsafe(
+            bot.open(),
+            bot.loop
+        )
+
+        return "Mensagem de ligamento enviada"
 
     @app.route('/enviar_msg_desligamento')
     def enviar_msg_desligamento():
