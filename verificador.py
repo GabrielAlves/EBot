@@ -1,5 +1,7 @@
 from excecoes import *
 
+WILDCARD = "*"
+
 class Verificador:
     def __init__(self, planilha):
         self.p = planilha
@@ -65,12 +67,24 @@ class Verificador:
 
         raise NomeInvalidoErro(nome, nomes[1:])
     
-    def verificar_valor(self, valor):
+    def verificar_valor(self, valor, pos = ""):
         try:
+            if valor == WILDCARD:
+                return True
+            
             valor = int(valor)
             if valor < 0:
-                raise ValorInvalidoErro(valor)
+                raise ValorInvalidoErro(valor, pos)
             
             return True
         except (TypeError, ValueError):
-            raise ValorInvalidoErro(valor)
+            raise ValorInvalidoErro(valor, pos)
+
+    def verificar_valores(self, valores):
+        if len(valores) > 7:
+            raise QuantidadeInvalidaErro(len(valores))
+
+        for pos, valor in enumerate(valores, start=1):
+            self.verificar_valor(valor, pos)
+
+        return True

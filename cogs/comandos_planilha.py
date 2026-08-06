@@ -1,5 +1,6 @@
 from discord.ext import commands
 from excecoes import *
+from verificador import WILDCARD
 
 class ComandosPlanilha(commands.Cog):
     def __init__(self, bot):
@@ -20,6 +21,28 @@ class ComandosPlanilha(commands.Cog):
             await ctx.send(f'```{linha}```')
         
         except (NomeInvalidoErro, DiaInvalidoErro, AbreviacaoInvalidaErro, ValorInvalidoErro) as e:
+            await ctx.send(e)
+
+        except Exception as e:
+            await ctx.send(f"Erro: {e}")
+
+    @commands.command(name = "linha", aliases=["escrever_linha"])
+    async def escrever_linha(self, ctx, nome, *valores):
+        try:
+            self.bot.verificador.verificar_valores(valores)
+            linha = self.bot.verificador.converter_nome_em_linha(nome)
+
+            for coluna, valor in enumerate(valores, start = 2):
+                if valor == WILDCARD:
+                    continue
+
+                self.bot.planilha.planilha.update_cell(linha, coluna, valor)
+
+            header, linha = self.bot.planilha.ler_linha(linha)
+            linha = self.bot.tabulacao.tabular(header, linha)
+            await ctx.send(f'```{linha}```')
+        
+        except (NomeInvalidoErro, DiaInvalidoErro, AbreviacaoInvalidaErro, ValorInvalidoErro, QuantidadeInvalidaErro) as e:
             await ctx.send(e)
 
         except Exception as e:
@@ -78,7 +101,7 @@ class ComandosPlanilha(commands.Cog):
 
     
 
-    @commands.command(name="linha", aliases=["ler_linha"])
+    @commands.command(name="ler_linha")
     async def ler_linha(self, ctx, nome):
         try:
             linha = self.bot.verificador.converter_nome_em_linha(nome)

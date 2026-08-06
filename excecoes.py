@@ -29,6 +29,14 @@ class AbreviacaoInvalidaErro(Exception):
         super().__init__(msg)        
 
 class ValorInvalidoErro(Exception):
-    def __init__(self, valor):
-        msg = f"O valor deve ser um inteiro positivo! Foi fornecido '{valor}'"
+    def __init__(self, valor, pos = ""):
+        if pos:
+            msg = f"O valor na posição {pos} deve ser um inteiro positivo! Foi fornecido '{valor}'"
+        else:
+            msg = f"O valor deve ser um inteiro positivo! Foi fornecido '{valor}'"
         super().__init__(msg)
+
+class QuantidadeInvalidaErro(Exception):
+    def __init__(self, valor):
+            msg = f"Podem ser fornecidos no máximo 7 valores! Foram fornecidos '{valor}' valores"
+            super().__init__(msg)
