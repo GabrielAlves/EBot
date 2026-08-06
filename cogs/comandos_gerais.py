@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from excecoes import *
 import re
+from verificador import WILDCARD
 
 class ComandosGerais(commands.Cog):
     def __init__(self, bot):
@@ -113,6 +114,13 @@ class ComandosGerais(commands.Cog):
             ),
 
             formatar_cmd(
+                            "linha", "<nome> <lista>",
+                            f"Escreve os valores da <lista> em <nome>.\nA lista deve conter de um a sete valores inteiros positivos ou o Wildcard {WILDCARD}\nA ordem dos valores indica os dias correspondentes, portanto o primeiro é pertencente ao domingo, o segundo é pertencente à segunda e assim por diante.\nO Wildcard {WILDCARD} permite deixar o valor daquele dia do jeito que já está.",
+                            "linha f * * 30 60", "➖"
+                        ),
+
+
+            formatar_cmd(
                 "zerar", "",
                 "Zera toda a tabela (define todos os tempos como 0).\n"
                 "Este comando não a zera de fato, mas aponta o usuário para outro comando para que ele não zere a tabela acidentalmente com esse comando.",
@@ -126,9 +134,9 @@ class ComandosGerais(commands.Cog):
             ),
 
             formatar_cmd(
-                "linha", "<nome>",
+                "ler_linha", "<nome>",
                 "Mostra a linha completa de um usuário.",
-                "linha carlos", "👤"
+                "ler_linha carlos", "👤"
             ),
 
             formatar_cmd(
